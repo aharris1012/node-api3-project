@@ -1,17 +1,33 @@
 const express = require('express');
+const users = require("./userDb");
+const postRouter = require("../posts/postRouter");
 
 const router = express.Router();
 
-router.post('/', (req, res) => {
-  // do your magic!
+router.use("/:id/posts", postRouter);
+router.post("/", validateUser(), (req, res) => {
+  users
+    .insert(req.body)
+    .then(data => res.json(data))
+    .catch(err =>
+      res
+        .status(404)
+        .json({ errorMessage: "cannot post user at this time", err })
+    );
 });
 
-router.post('/:id/posts', (req, res) => {
-  // do your magic!
+router.post("/:id/posts", validateUserId(), validatePost(), (req, res) => {
+  posts
+    .insert(req.text)
+    .then(data => res.json(data))
+    .catch(err => res.status(500).json({ error: "Post cannot be created" }));
 });
 
-router.get('/', (req, res) => {
-  // do your magic!
+router.get("/", (req, res) => {
+  users
+    .get()
+    .then(data => res.json(data))
+    .catch(err => res.status(404).json({ message: "could not find users" }));
 });
 
 router.get('/:id', (req, res) => {
